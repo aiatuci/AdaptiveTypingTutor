@@ -43,6 +43,10 @@ def main():
   print(data)
 
 
+def get_data(user_id: str) -> pd.DataFrame:
+  return pd.read_csv(f"{user_id}.csv")
+
+
 if __name__ == "__main__":
   main()
 
