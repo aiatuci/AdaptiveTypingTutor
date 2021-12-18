@@ -24,7 +24,7 @@ class KeyEvent():
     Attributes:
         name (str): The character or keysym of key that was pressed.
         type (str): The type of event that occurred ('up' or 'down').
-        timestamp (int): The time the event occurred in milliseconds since start of app.
+        timestamp (int): The time the event occurred in milliseconds since start of app or epoch time.
     """
     def __init__(self, name: str, event_type: str, timestamp: int):
         """
@@ -67,14 +67,52 @@ class InputFrame(tk.Frame):
         self.input_box.pack(side='bottom')
 
 
+class Body(tk.Frame):
+    """
+    Frame which contains the prompt and input box
+    """
+    def __init__(self, root, prompt: str):
+        super().__init__(root)
+
+        self.prompt = prompt
+
+        # Create the prompt frame
+        self.prompt_frame = PromptFrame(self, self.prompt)
+        self.prompt_frame.pack(side='top', anchor='nw', fill='x')
+
+        # Create the input frame
+        self.input_frame = InputFrame(self)
+        self.input_frame.pack(side='top')
+
+
+
+class SettingsFrame(tk.Frame):
+    """
+    Settings panel
+    """
+    def __init__(self, root):
+        super().__init__(root)
+
+        # Create the label and pack it to the top of the settings frame
+        self.label = tk.Label(self, text='Settings', font=('Helvetica', 16))
+        self.label.grid(row=0, column=0, columnspan=2, sticky='nsew')
+
+        # Create the checkbox and pack it to the bottom of the settings frame
+        self.log_keyup_button = tk.Checkbutton(self, text='Log keyup events', variable=root.options['log_keyup'])
+        self.log_keyup_button.grid(row=1, column=0, sticky='nsew')
+    
+
 class App(tk.Frame):
     """
     Main application window
     """
     def __init__(self, root=None):
         super().__init__(root)
-        # pack() loads and positions the frame in the window
-        self.pack()
+
+        self.options = {
+            # To store the option of whether to log the keyup events
+            'log_keyup': tk.BooleanVar(value=True),
+        }
 
         # Listener for keystrokes
         self.bind_all('<KeyPress>', self.record_keystroke)
@@ -88,6 +126,9 @@ class App(tk.Frame):
 
         self.create_widgets()
 
+        # pack() loads and positions the frame in the window
+        self.pack()
+
 
     def create_widgets(self):
         """
@@ -98,13 +139,13 @@ class App(tk.Frame):
         self.menu_bar.add_command(label='Export', command=self.export_button_callback)
         self.master.config(menu=self.menu_bar)
 
-        # Create the prompt frame
-        self.prompt_frame = PromptFrame(self, self.prompt)
-        self.prompt_frame.pack(side='top', anchor='nw', fill='x')
+        # Create the body frame
+        self.body = Body(self, self.prompt)
+        self.body.pack(side='left', fill='y', expand=True)
 
-        # Create the input frame
-        self.input_frame = InputFrame(self)
-        self.input_frame.pack(side='top')
+        # Create the settings frame
+        self.settings_frame = SettingsFrame(self)
+        self.settings_frame.pack(side='right', anchor='ne')
     
 
     def export_button_callback(self):
@@ -130,7 +171,7 @@ class App(tk.Frame):
         Callback used in the input box to record the keystroke.
         """
         # If the input box is not focused, don't record the keystroke
-        if self.input_frame.input_box.focus_get() is not self.input_frame.input_box:
+        if self.focus_get() is not self.body.input_frame.input_box:
             return
 
         # Filter out unwanted events
@@ -181,12 +222,21 @@ class App(tk.Frame):
                 # Change the timestamp from relative to absolute (Unix ms)
                 key_event.timestamp + START_TIME
                 ))
-
+        
         # Convert the list of keypress tuples to a pandas dataframe
-        df = pd.DataFrame(translated_events, columns=('key', 'type', 'timestamp'))
-
         # Output the dataframe to a csv file
         if file_path is not None:
+            # Create the dataframe
+            df = pd.DataFrame(translated_events, columns=('key', 'type', 'timestamp'))
+            
+            # If not logging keyup events, remove the keyup events and remove the event type column
+            if not self.options['log_keyup'].get():
+                # Filter for only keydown events
+                df = df[df['type'] == 'down']
+                # Remove the event type column
+                df = df.drop(columns=['type'])
+                
+            # Save the dataframe to a csv file
             df.to_csv(file_path, index=False)
 
         if return_format == 'df':
@@ -206,6 +256,7 @@ class App(tk.Frame):
         Currently a placeholder.
         """
         return 'Hello, World!'
+    
 
 
 if __name__ == '__main__':
