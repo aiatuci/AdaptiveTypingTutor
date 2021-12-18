@@ -14,7 +14,7 @@ from ui_tools.utils import replace_words
 
 # Time that the app was started (in Unix ms)
 # It's added to event.time to get the unix ms time of the event
-START_TIME = int(time.time()*1e7)
+START_TIME = round(time.time()*1e3)
 print('START_TIME:', START_TIME)
 
 class KeyEvent():
@@ -84,7 +84,7 @@ class App(tk.Frame):
         self.keypresses: list[KeyEvent] = []
 
         # Placeholder for the prompt. This will probably be replaced with a server query.
-        self.prompt = 'Hello, World!'
+        self.prompt = self.get_prompt()
 
         self.create_widgets()
 
@@ -192,11 +192,20 @@ class App(tk.Frame):
         if return_format == 'df':
             return df
         elif return_format == 'list':
-            # Return the list of KeyEvent objects with the renamed keys
+            # Return the list of KeyEvent objects with the renamed keys and absolute timestamps
             return [KeyEvent(name, type, timestamp) for name, type, timestamp in translated_events]
         
         # This should not be accessible
         raise Exception('I don\'t know how we got here')
+    
+
+    @staticmethod
+    def get_prompt() -> str:
+        """
+        Retrieves a prompt for the user to type.
+        Currently a placeholder.
+        """
+        return 'Hello, World!'
 
 
 if __name__ == '__main__':

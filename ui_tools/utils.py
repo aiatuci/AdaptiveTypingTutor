@@ -15,11 +15,15 @@ def replace_words(words: Union[str, Iterable], replacement_dict: dict) -> Union[
     """
 
     def replace_word(word: str) -> str:
+        """
+        Replace a word in a string with the value in replacement_dict if there's a match.
+        """
         for key, value in replacement_dict.items():
             word = word.replace(key, value)
+        return word
 
     if isinstance(words, str):
-        return replace_words(words)
+        return replace_word(words)
 
     if isinstance(words, Iterable):
         return [replace_word(word) for word in words]
