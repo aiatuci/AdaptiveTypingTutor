@@ -5,7 +5,7 @@ Entry point for desktop app
 import tkinter as tk
 from tkinter import scrolledtext, filedialog
 
-import time
+import time, random, string
 import pandas as pd
 
 from ui_tools.app_config import ALLOWED_CHARS, KEYSYM_TRANSLATION_TABLE
@@ -53,6 +53,13 @@ class PromptFrame(tk.Frame):
         # Text box for prompt text
         self.prompt_frame = tk.Label(self, font=('Helvetica', 14), text=prompt)
         self.prompt_frame.pack(side='top', anchor='nw')
+    
+
+    def update_prompt(self, prompt: str):
+        """
+        Update the prompt text
+        """
+        self.prompt_frame.config(text=prompt)
 
 
 class InputFrame(tk.Frame):
@@ -90,8 +97,9 @@ class SettingsFrame(tk.Frame):
     """
     Settings panel
     """
-    def __init__(self, root):
+    def __init__(self, root: 'App'):
         super().__init__(root)
+        self.root = root
 
         # Create the label and pack it to the top of the settings frame
         self.label = tk.Label(self, text='Settings', font=('Helvetica', 16))
@@ -100,6 +108,15 @@ class SettingsFrame(tk.Frame):
         # Create the checkbox and pack it to the bottom of the settings frame
         self.log_keyup_button = tk.Checkbutton(self, text='Log keyup events', variable=root.options['log_keyup'])
         self.log_keyup_button.grid(row=1, column=0, sticky='nsew')
+        
+        # Button to upload results
+        self.upload_button = tk.Button(self, text='Upload results', command=self.upload_callback)
+        self.upload_button.grid(row=2, column=1, sticky='s')
+    
+
+    def upload_callback(self):
+        self.root.upload_results()
+        self.root.reload_test()
     
 
 class App(tk.Frame):
@@ -247,15 +264,33 @@ class App(tk.Frame):
         
         # This should not be accessible
         raise Exception('I don\'t know how we got here')
-    
+
+
+    def reload_test(self):
+        """
+        Reloads the test data from the server and updates the prompt.
+        """
+        # Get the new prompt
+        self.prompt = self.get_prompt()
+
+        # Update the prompt
+        self.body.prompt_frame.update_prompt(self.prompt)
 
     @staticmethod
     def get_prompt() -> str:
         """
         Retrieves a prompt for the user to type.
-        Currently a placeholder.
+        Currently a placeholder the returns a random string of length 10.
         """
-        return 'Hello, World!'
+        return ''.join(random.choices(string.ascii_letters, k=10))
+
+    
+    def upload_results(self):
+        """
+        Uploads the results to the server.
+        Currently a placeholder that prints the results to the console.
+        """
+        print(self.keypresses[-10:])
     
 
 
