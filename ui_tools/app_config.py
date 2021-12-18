@@ -8,7 +8,7 @@ ALLOWED_CHARS: set[str] = set(
 
 
 KEYSYM_TRANSLATION_TABLE = {
-    'space': 'SPACE',
+    'space': ' ',
     'Return': 'ENTER',
     'BackSpace': 'BACKSPACE',
 }
