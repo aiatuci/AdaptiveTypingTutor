@@ -9,7 +9,6 @@ import boto3#pip install boto3
 #local files
 import aws_config#./aws_config.py
 
-
 from botocore.exceptions import ClientError
 
 # Helper class to convert a DynamoDB item to JSON.
@@ -40,3 +39,25 @@ except ClientError as e:
 else:
     print("PutItem succeeded:")
     print(json.dumps(response, indent=4, cls=DecimalEncoder))
+
+'''
+TODO: make into rest api web server
+endpoints:
+PUT /sentence?id=example
+request body is the sentence itself
+
+PUT /keystrokes?user=example&session=example2
+request body is the csv-formatted data, with each row like this:
+user-id, session-id, sentence-id, timestamp, key
+
+GET /sentence?id=example
+
+GET /keystrokes?user=example
+GET /keystrokes?session=example2 ???
+GET /keystrokes?user=example&session=example2 ???
+If each session is unique and only has one user, we might only need it to accept session as a query param and it can ignore user
+
+GET /keystrokes?sentence=example-sentence-id ??? if we need to get all keystrokes typed for a certain sentence
+
+
+'''
