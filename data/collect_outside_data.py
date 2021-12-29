@@ -4,17 +4,19 @@ from pathlib import Path
 import csv
 import time
 import string
+import json
 
 
-DATA_DIR = 'E:/Data/Raw/Keystrokes/files'
-OUT_DIR = 'E:/Data/Modified'
+DATA_DIR = ''
+OUT_DIR = ''
 
 SENTENCE_INDEX = 2
 PRESS_TIME_INDEX = 5
 LETTER_INDEX = 7
 PARTICIPANT_ID_INDEX = 0
 
-WHITELISTED_LETTERS = [c for c in string.ascii_letters + string.digits + string.punctuation + ' '] + ['BKSP']
+with open('data/settings.json') as settings:
+    WHITELISTED_LETTERS = json.load(settings)['allowed_chars']
 
 def main():
     data_dir = Path(DATA_DIR)
